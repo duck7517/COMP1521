@@ -1,0 +1,51 @@
+# read two integers and print all the integers which have their bottom 2 bits set.
+
+main:
+    li $v0, 5
+    syscall
+    move $t0, $v0
+
+    li $v0, 5
+    syscall
+    move $t1, $v0
+
+
+    
+    # REPLACE THE LINES BELOW WITH YOUR CODE
+    li   $t3, 3         #setMask = 3;
+    li   $t4, 0
+    
+print_loop_prologue:
+    li   $t2, 0
+    addi $t2, $t0, 1       #i = x + 1
+
+print_loop_body:    
+    bge  $t2, $t1, end  #loop condition
+    
+    and  $t4, $t3, $t2
+    
+    beq  $t4, $t3, print
+    
+    addi $t2, $t2, 1
+    b    print_loop_body
+    
+print:
+    move $a0, $t2
+    li   $v0, 1
+    syscall
+    
+    # print the newline
+    li   $a0, '\n'
+    li   $v0, 11
+    syscall
+    
+    addi $t2, $t2, 1
+    
+    b    print_loop_body
+    
+    # REPLACE THE LINES ABOVE WITH YOUR CODE
+
+
+end:
+    li $v0, 0
+    jr $31

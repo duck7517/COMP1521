@@ -1,0 +1,94 @@
+# Args: void
+        # Returns:
+        #   - $v0: int
+        #
+        # Frame:    $ra, $s0
+        # Uses:     $a0, $v0, $t0, $t1, $s0
+        # Clobbers: $a0, $v0, $t0, $t1
+        #
+        # Locals:
+        #   - `int score`    in $s0
+        #   - `int response` in $t0
+        #
+        # Structure:
+        #   check_end_play
+        #   -> [prologue]
+        #       -> lose
+        #   -> high_score
+        #       -> update_highscore
+        #       -> print_highscore
+        #   -> new_game
+        #   -> [epilogue]
+*********************************************************************       
+        
+        place_single_bomb:
+        # Args:
+        #   - $a0: bad_row
+        #   - $a1: bad_col
+        # Returns: void
+        #
+        # Frame:    $ra, $s0, $s1, $s2, $s3
+        # Uses:     $a0, $t0, $t1, $s0, $s1, $s2, $s3
+        # Clobbers: $a0, $t0, $t1
+        #
+        # Locals:
+        #   - `int row` in $s0
+        #   - `int col` in $s1
+        #   - `int bad_row` in $s2
+        #   - `int bad_col` in $s3
+        #
+        # Structure:
+        #   check_valid_input
+        #   -> [prologue]
+        #   -> do
+        #   -> while
+        #   -> place_bomb
+        #   -> [epilogue]
+
+place_single_bomb__prologue:
+        addiu   $sp, $sp, -20
+        sw      $ra, 0($sp)
+        sw      $s0, 4($sp)
+        sw      $s1, 8($sp)
+        sw      $s2, 12($sp)
+        sw      $s3, 16($sp)
+
+        move    $s2, $a0                # store bad_row
+        move    $s3, $a1                # store bad_col
+                                        #
+place_single_bomb__do:
+        li      $a0, N_ROWS             #
+        jal     rand_value              #
+        move    $s0, $v0                # row = rand_value(N_ROWS);
+                                        #
+        li      $a0, N_COLS             #
+        jal     rand_value              #
+        move    $s1, $v0                # col = rand_value(N_COLS);
+                                        #
+place_single_bomb__while:               # is_bad_cell(
+        move    $a0, $s0                #       row,
+        move    $a1, $s1                #       col,
+        move    $a2, $s2                #       bad_row,
+        move    $a3, $s3                #       bad_col
+        jal     is_bad_cell             # );
+                                        #
+        beq     $v0, TRUE, place_single_bomb__do        # while(is_bad_cell(...));
+                                        #
+place_single_bomb__place_bomb:
+        mul     $t0, $s0, N_COLS        #
+        add     $t0, $t0, $s1           #
+        lb      $t1, grid($t0)          # $t1 = grid[row][col]
+                                        #
+        ori     $t1, $t1, IS_BOMB_MASK  #
+        sb      $t1, grid($t0)          # grid[row][col] |= IS_BOMB_MASK;
+                                        #
+place_single_bomb__epilogue:
+        lw      $s3, 16($sp)
+        lw      $s2, 12($sp)
+        lw      $s1, 8($sp)
+        lw      $s0, 4($sp)
+        lw      $ra, 0($sp)
+        addiu   $sp, $sp, 20
+
+        jr      $ra
+

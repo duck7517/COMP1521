@@ -1,0 +1,185 @@
+////////////////////////////////////////////////////////////////////////
+// COMP1521 21T3 --- Assignment 2: `chicken', a simple file archiver
+// <https://www.cse.unsw.edu.au/~cs1521/21T3/assignments/ass2/index.html>
+//
+// Written by Lisa Guo (z5312476) on November 2021.
+//
+// 2021-11-08   v1.1    Team COMP1521 <cs1521 at cse.unsw.edu.au>
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include "chicken.h"
+
+
+// ADD ANY extra #defines HERE
+#define MAX_NAME_LENGTH 256
+// ADD YOUR FUNCTION PROTOTYPES HERE
+
+
+// print the files & directories stored in egg_pathname (subset 0)
+//
+// if long_listing is non-zero then file/directory permissions, formats & sizes are also printed (subset 0)
+
+void list_egg(char *egg_pathname, int long_listing) {
+    FILE *egg = fopen(egg_pathname, "r");
+    int curr_byte = fgetc(egg);
+    int magic_number = 0;
+    char pathname[MAX_NAME_LENGTH];
+    //get length of each egglet pathname and name.
+    while (curr_byte == EGGLET_MAGIC) {
+        if (long_listing) { // print detailed list of contents if long_listing
+            // extract egglet format
+            curr_byte = fgetc(egg);
+            int egglet_format = curr_byte;
+            
+            // print each permission
+            int perm_bytes = 0;
+            while (perm_bytes < 10) {
+                curr_byte = fgetc(egg);
+                printf("%c", curr_byte);
+                perm_bytes++;
+            }
+            
+            // print egglet format
+            printf("  %c    ", egglet_format);
+            
+            // extract pathname_length (problem)
+            curr_byte = fgetc(egg);
+            uint8_t first = curr_byte;
+            curr_byte = fgetc(egg);
+            uint8_t second = curr_byte;
+            
+            uint16_t name_length = 0;
+            name_length |= second;
+            name_length <<= 8;
+            name_length |= first;
+            
+            // use pathname_length to extract pathname
+            // and store in string
+            uint8_t i = 0;
+            while (i < name_length) {
+                curr_byte = fgetc(egg);
+                pathname[i] = curr_byte;
+                i++;
+            }
+            pathname[i] = '\0';
+            
+            // extract file/directory size (problem)
+            uint64_t item_size = 0;
+            int counter_bytes = 0;
+            while (counter_bytes < 6) {
+                curr_byte = fgetc(egg);
+                uint64_t size_byte = 0;
+                size_byte &= curr_byte;
+                size_byte <<= (counter_bytes * 8);
+                item_size |= size_byte;
+                counter_bytes++;
+            }
+            // print size 
+            printf("%3lu  ", item_size);
+            
+        } else {
+            
+            // just find pathnames
+            // extract pathname_length (problem)
+            int count_offset = 1;
+            while (count_offset < EGG_OFFSET_PATHNLEN) {
+                curr_byte = fgetc(egg);
+                count_offset++;
+            }
+            
+            curr_byte = fgetc(egg);
+            uint8_t first = curr_byte;
+            curr_byte = fgetc(egg);
+            uint8_t second = curr_byte;
+            
+            uint16_t name_length = 0;
+            name_length |= second;
+            name_length <<= 8;
+            name_length |= first;
+            
+            // use pathname_length to extract pathname
+            // and store in string
+            uint8_t i = 0;
+            while (i < name_length) {
+                curr_byte = fgetc(egg);
+                pathname[i] = curr_byte;
+                i++;
+            }
+            pathname[i] = '\0';
+        }
+        
+        // print name of item
+        printf("%s\n", pathname);
+        
+        
+        // find start of next egglet
+        // next egglet starts with magic number
+        // read bytes until found magic number
+        magic_number = 0;
+        while (curr_byte != EOF && magic_number == 0) {
+            curr_byte = fgetc(egg);
+            if (curr_byte == EGGLET_MAGIC) {
+                magic_number = 1;
+                //curr_byte = fgetc(egg);
+            }
+        }
+    }
+    fclose(egg);
+}
+
+
+
+// check the files & directories stored in egg_pathname (subset 1)
+//
+// prints the files & directories stored in egg_pathname with a message
+// either, indicating the hash byte is correct, or
+// indicating the hash byte is incorrect, what the incorrect value is and the correct value would be
+
+void check_egg(char *egg_pathname) {
+
+    // REPLACE THIS PRINTF WITH YOUR CODE
+
+    printf("check_egg called to check egg: '%s'\n", egg_pathname);
+}
+
+
+// extract the files/directories stored in egg_pathname (subset 2 & 3)
+
+void extract_egg(char *egg_pathname) {
+
+    // REPLACE THIS PRINTF WITH YOUR CODE
+
+    printf("extract_egg called to extract egg: '%s'\n", egg_pathname);
+}
+
+
+// create egg_pathname containing the files or directories specified in pathnames (subset 3)
+//
+// if append is zero egg_pathname should be over-written if it exists
+// if append is non-zero egglets should be instead appended to egg_pathname if it exists
+//
+// format specifies the egglet format to use, it must be one EGGLET_FMT_6,EGGLET_FMT_7 or EGGLET_FMT_8
+
+void create_egg(char *egg_pathname, int append, int format,
+                int n_pathnames, char *pathnames[n_pathnames]) {
+
+    // REPLACE THIS CODE PRINTFS WITH YOUR CODE
+
+    printf("create_egg called to create egg: '%s'\n", egg_pathname);
+    printf("format = %x\n", format);
+    printf("append = %d\n", append);
+    printf("These %d pathnames specified:\n", n_pathnames);
+    for (int p = 0; p < n_pathnames; p++) {
+        printf("%s\n", pathnames[p]);
+    }
+}
+
+
+// ADD YOUR EXTRA FUNCTIONS HERE

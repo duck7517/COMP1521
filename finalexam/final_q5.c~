@@ -1,0 +1,27 @@
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+
+// given 2 uint32_t values
+// return the number of bits which are set (1) in both values
+
+int final_q5(uint32_t value1, uint32_t value2) {
+    int sameBits = 0;
+    
+    int i = 0;
+    uint32_t mask = 1;
+    while (i < 32) {
+        
+        int curr1 = value1 & mask;
+        int curr2 = value2 & mask;
+        if (curr1 == mask && curr2 == mask) {
+            sameBits ++;
+        }
+        
+        mask <<= 1; 
+        i++;
+    }
+    
+    
+    return sameBits;
+}

@@ -1,0 +1,1 @@
+/web/cs1521/21T3/activities/chicken/files.ln/chicken_6_bit.c

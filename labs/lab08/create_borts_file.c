@@ -1,0 +1,46 @@
+/*
+Lab 8 Exercise: Create Borts File
+Written on November 2021 by z5312476
+*/
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        perror("Please enter 3 arguments.\n");
+        return 1;
+    }
+
+    FILE *output_stream = fopen(argv[1], "w");
+    
+    if (output_stream == NULL) {
+        perror("File cannot be created.\n");
+        return 1;
+    }
+    
+    int min = atoi(argv[2]);    
+    int max = atoi(argv[3]);
+    
+    int secondMask = 1 << 8;
+    secondMask--;
+    int firstMask = secondMask << 8;
+    
+    
+    int i = min;
+    
+    while (i <= max) {
+        int firstHalf = i & firstMask;
+        firstHalf >>= 8;
+        int secondHalf = i & secondMask;
+        
+        fprintf(output_stream, "%c%c", firstHalf, secondHalf); 
+        i++;
+    }
+    
+    fclose(output_stream);
+    
+    return 0;   
+}

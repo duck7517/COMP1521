@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// print the locations of a specified byte sequence in a file
+// the first command line argument is a filname
+// other command line arguments are integers specifying a byte sequence
+// all positions the byte sequence occurs in the file are printed
+
+int main(int argc, char *argv[]) {
+
+    FILE *file = fopen(argv[1], "r");
+    fseek(file, 0, SEEK_END);
+    int size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    //number of bytes given
+    int search_bytes = argc - 2;
+    int j = 0;
+    int bytes[search_bytes];
+    while (j < search_bytes) {
+        bytes[j] = atoi(argv[j+2]);
+        j++;
+    }
+    
+    int i = 0;
+    int sequence_unfound = 1;
+    int c;
+    while (i < size && sequence_unfound) {
+        c = fgetc(file);
+        if (c == bytes[0]) {
+            //first byte found, test next bytes search_byte number of bytes.
+            j = 1;
+            int keep_testing = 1;
+            while (j < search_bytes || keep_testing != 0) {
+                c = fgetc(file);
+                if (c != bytes[j]) {
+                    keep_testing = 0;
+                }
+                j++;
+            } 
+            if (keep_testing == 1) {
+                sequence_unfound = 0;
+            }
+            if (!sequence_unfound) {
+                printf("Sequence found at byte position: %d", i);
+                break;
+            }
+            
+            
+            fseek(file, -j, SEEK_CUR);
+        }
+        i++;
+    }
+    if (sequence_unfound) {
+        printf("Sequence not found\n");
+    }
+    fclose(file);
+    
+    return 0;
+}
