@@ -1,1 +1,0 @@
-/web/cs1521/20T3/activities/collatz/files.ln/collatz.mk

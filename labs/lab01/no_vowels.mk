@@ -1,1 +1,0 @@
-/web/cs1521/20T3/activities/no_vowels/files.ln/no_vowels.mk

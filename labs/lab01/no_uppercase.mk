@@ -1,1 +1,0 @@
-/web/cs1521/20T3/activities/no_uppercase/files.ln/no_uppercase.mk
